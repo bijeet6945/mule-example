@@ -26,6 +26,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     
     <flow name="SimpleExampleFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/simple" doc:name="HTTP - /simple" />      
+        <custom-interceptor class="com.clarkjohn.mule.interceptor.AccessLogInterceptor" />
         
         <logger level="INFO" message="some simple logging" doc:name="Logger" />
         
@@ -34,6 +35,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     
     <flow name="CorrelationIdExampleFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/correlation" doc:name="HTTP - /correlation" />      
+        <custom-interceptor class="com.clarkjohn.mule.interceptor.AccessLogInterceptor" />
 
         <logger level="INFO" message="setting correlationId" doc:name="Logger" />
         <scripting:component doc:name="Script">
@@ -46,6 +48,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
     
     <flow name="WaitExampleFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/wait" doc:name="HTTP - /wait" />      
+        <custom-interceptor class="com.clarkjohn.mule.interceptor.AccessLogInterceptor" />
 
         <logger level="INFO" message="before wait" doc:name="Logger" />
         <scripting:component doc:name="Script">
@@ -58,6 +61,7 @@ http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/cor
 
     <flow name="ErrorExampleFlow">
         <http:listener config-ref="HTTP_Listener_Configuration" path="/error" doc:name="HTTP - /error" />      
+        <custom-interceptor class="com.clarkjohn.mule.interceptor.AccessLogInterceptor" />
         
         <scripting:component doc:name="Script">
             <scripting:script engine="groovy" ><![CDATA[throw new RuntimeException()]]></scripting:script>

@@ -1,50 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Configuration>
 
-	<!--These are some of the loggers you can enable. 
-	    There are several more you can find in the documentation. 
-        Besides this log4j configuration, you can also use Java VM environment variables
-        to enable other logs like network (-Djavax.net.debug=ssl or all) and 
-        Garbage Collector (-XX:+PrintGC). These will be append to the console, so you will 
-        see them in the mule_ee.log file. -->
+    <!--These are some of the loggers you can enable. There are several more you can find in the documentation. Besides this log4j configuration, you can 
+        also use Java VM environment variables to enable other logs like network (-Djavax.net.debug=ssl or all) and Garbage Collector (-XX:+PrintGC). These will 
+        be append to the console, so you will see them in the mule_ee.log file. -->
 
 
     <Appenders>
-        <RollingFile name="file" fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}mule-logging-template2.log" 
-                 filePattern="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}mule-logging-template2-%i.log">
-            <PatternLayout pattern="%d [%t] %-5p %c - %m%n" />
+        <RollingFile name="file" fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}mule-logging.log"
+            filePattern="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}mule-logging-%i.log">
+            <PatternLayout pattern="%d [%t] %-5p %c - %X{requestDetails}%m%n" />
             <SizeBasedTriggeringPolicy size="10 MB" />
-            <DefaultRolloverStrategy max="10"/>
+            <DefaultRolloverStrategy max="10" />
         </RollingFile>
+        
+        <RollingFile name="accessLogFile" fileName="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}${sys:file.separator}mule-logging-access.log"
+            filePattern="${sys:mule.home}${sys:file.separator}logs${sys:file.separator}mule-logging-access-%i.log">
+            <PatternLayout pattern="%d  %X{requestDetails} %m%n" />
+            <SizeBasedTriggeringPolicy size="10 MB" />
+            <DefaultRolloverStrategy max="10" />
+        </RollingFile>
+
+        <Console name="console" target="SYSTEM_OUT">
+             <PatternLayout pattern="%-5p %d [%10.10t] %-35.35c{3.5.5.1}: %X{requestDetails}%m%n"/>
+        </Console>
+
     </Appenders>
     <Loggers>
-    	
-    	
-		<!-- Http Logger shows wire traffic on DEBUG -->
-		<AsyncLogger name="org.mule.module.http.internal.HttpMessageLogger" level="WARN"/>
-	
-		<!-- JDBC Logger shows queries and parameters values on DEBUG -->
-		<AsyncLogger name="com.mulesoft.mule.transport.jdbc" level="WARN"/>
-    
-        <!-- CXF is used heavily by Mule for web services -->
-        <AsyncLogger name="org.apache.cxf" level="WARN"/>
 
-        <!-- Apache Commons tend to make a lot of noise which can clutter the log-->
-        <AsyncLogger name="org.apache" level="WARN"/>
+        <AsyncLogger name="accessLog" level="INFO">
+            <AppenderRef ref="accessLogFile" />
+            <AppenderRef ref="file" />
+        </AsyncLogger>
+
+        <!-- Http Logger shows wire traffic on DEBUG -->
+        <AsyncLogger name="org.mule.module.http.internal.HttpMessageLogger" level="WARN" />
+
+        <!-- JDBC Logger shows queries and parameters values on DEBUG -->
+        <AsyncLogger name="com.mulesoft.mule.transport.jdbc" level="WARN" />
+
+        <!-- CXF is used heavily by Mule for web services -->
+        <AsyncLogger name="org.apache.cxf" level="WARN" />
+
+        <!-- Apache Commons tend to make a lot of noise which can clutter the log -->
+        <AsyncLogger name="org.apache" level="WARN" />
 
         <!-- Reduce startup noise -->
-        <AsyncLogger name="org.springframework.beans.factory" level="WARN"/>
+        <AsyncLogger name="org.springframework.beans.factory" level="WARN" />
 
         <!-- Mule classes -->
-        <AsyncLogger name="org.mule" level="INFO"/>
-        <AsyncLogger name="com.mulesoft" level="INFO"/>
+        <AsyncLogger name="org.mule" level="INFO" />
+        <AsyncLogger name="com.mulesoft" level="INFO" />
 
         <!-- Reduce DM verbosity -->
-        <AsyncLogger name="org.jetel" level="WARN"/>
-        <AsyncLogger name="Tracking" level="WARN"/>
-        
+        <AsyncLogger name="org.jetel" level="WARN" />
+        <AsyncLogger name="Tracking" level="WARN" />
+
         <AsyncRoot level="INFO">
             <AppenderRef ref="file" />
+            <AppenderRef ref="console" />
         </AsyncRoot>
     </Loggers>
 </Configuration>
