@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:scripting="http://www.mulesoft.org/schema/mule/scripting"
+	xmlns:tls="http://www.mulesoft.org/schema/mule/tls" 
+    xmlns:http="http://www.mulesoft.org/schema/mule/http" 
+    xmlns="http://www.mulesoft.org/schema/mule/core"
+    xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" 
+    xmlns:spring="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xsi:schemaLocation="http://www.mulesoft.org/schema/mule/scripting http://www.mulesoft.org/schema/mule/scripting/current/mule-scripting.xsd
+http://www.mulesoft.org/schema/mule/tls http://www.mulesoft.org/schema/mule/tls/current/mule-tls.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-current.xsd
+http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd">
+
+    <http:listener-config name="HTTP_Listener_Configuration" host="0.0.0.0" port="80" doc:name="HTTP Listener Configuration" />
+
+    <http:request-config name="HTTPS_Request_Configuration_jsonplaceholder" protocol="HTTPS" host="jsonplaceholder.typicode.com"
+        port="443" doc:name="HTTPS Request Configuration">
+        <tls:context>
+            <tls:trust-store path="${java.home}\lib\security\cacerts" password="changeit" type="jks" insecure="true" />
+        </tls:context>
+    </http:request-config>
+    
+    <flow name="SimpleExampleFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/simple" doc:name="HTTP - /simple" />      
+        
+        <logger level="INFO" message="some simple logging" doc:name="Logger" />
+        
+        <set-payload value="test" doc:name="Set Payload" />
+    </flow>
+    
+    <flow name="CorrelationIdExampleFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/correlation" doc:name="HTTP - /correlation" />      
+
+        <logger level="INFO" message="setting correlationId" doc:name="Logger" />
+        <scripting:component doc:name="Script">
+            <scripting:script engine="Groovy"><![CDATA[message.correlationId=message.id]]></scripting:script>
+        </scripting:component>
+        
+        <set-payload value="test" doc:name="Set Payload" />
+    </flow>
+    
+    
+    <flow name="WaitExampleFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/wait" doc:name="HTTP - /wait" />      
+
+        <logger level="INFO" message="before wait" doc:name="Logger" />
+        <scripting:component doc:name="Script">
+            <scripting:script engine="groovy" ><![CDATA[sleep(5000)]]></scripting:script>
+        </scripting:component>
+        <logger level="INFO" message="after wait" doc:name="Logger" />
+        
+        <set-payload value="test" doc:name="Set Payload" />
+    </flow>
+
+    <flow name="ErrorExampleFlow">
+        <http:listener config-ref="HTTP_Listener_Configuration" path="/error" doc:name="HTTP - /error" />      
+        
+        <scripting:component doc:name="Script">
+            <scripting:script engine="groovy" ><![CDATA[throw new RuntimeException()]]></scripting:script>
+        </scripting:component>
+        
+        <set-payload value="test" doc:name="Set Payload" />
+    </flow>
+
+</mule>
